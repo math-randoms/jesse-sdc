@@ -24,4 +24,6 @@ coverage
 build/
 bundle.js
 
+seed.json
+
 package-lock.json
