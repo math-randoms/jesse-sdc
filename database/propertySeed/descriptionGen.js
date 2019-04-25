@@ -95,7 +95,7 @@ let amenIcons = [
 
 const firstNames = ['Mark', 'Jaime', 'Arya', 'Cersei', 'Tyrion', 'Michael', 'Sansa', 'Cassie', 'Sarah', 'Jackie', 'John', 'Fred', 'Jacob', 'Daniel', 'Jason', 'Anthony'];
 const lastNames = ['', 'Johnson', 'Lee', 'Smith', 'Snow', 'Matthews', 'Rodriquez', 'Chan', 'Schmidt', 'Lannister', 'Tyrell', 'Stark', 'Bolton'];
-const names = [`${randomElement(firstNames)}`, `${randomElement(firstNames)} ${randomElement(lastNames)}`, `${randomElement(firstNames)} and ${randomElement(firstNames)}`];
+const names = () => [`${randomElement(firstNames)}`, `${randomElement(firstNames)} ${randomElement(lastNames)}`, `${randomElement(firstNames)} and ${randomElement(firstNames)}`];
 randomElement(names);
 let hostImgs = [
   'https://s3-us-west-1.amazonaws.com/airbnb-icons-png/hosts/host-adam.png',
@@ -137,7 +137,7 @@ generateProperty = (i) => {
     },
     numBaths: Math.ceil(Math.random() * 4),
     host: {
-      name: randomElement(names),
+      name: randomElement(names()),
       pictureUrl: randomElement(hostImgs) // randomElement(hostUrls)
     },
     summary: makeDescription(),
