@@ -1,13 +1,35 @@
-var mongoose = require('mongoose');
-
-let propertySchema = mongoose.Schema ({
-  id: { type: Number, index: true, unique: true },
-  propertyInfo: {propType: String, title: String, location: String, numGuests: Number},
-  beds: {quantity: Number, bedType: Array, iconUrl: Array},
-  amenities: {basic: Array, notIncluded: Array, iconUrl: Array},
-  numBaths: Number,
-  host: { name: String, pictureUrl: String },
-  summary: Array // or String
+const HouseDescriptions = sequelize.define('housedescriptions', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  propertyInfo: {
+    type: Sequelize.JSON,
+    allowNull: true
+  },
+  beds: {
+    type: Sequelize.JSON,
+    allowNull: true
+  },
+  amenities: {
+    type: Sequelize.JSON,
+    allowNull: true
+  },
+  numBaths: {
+    type: Sequelize.INTEGER,
+    allowNull: true
+  },
+  host: {
+    type: Sequelize.JSON,
+    allowNull: true
+  },
+  summary: {
+    type: Sequelize.JSON,
+    allowNull: true
+  },
+  __v: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  }
 });
- 
-module.exports = propertySchema;

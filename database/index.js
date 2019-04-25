@@ -1,11 +1,30 @@
-const mongoose = require('mongoose');
+
 const propertySchema = require('./propertySchema.js');
 
-mongoose.Promise = global.Promise;
+const Sequelize = require('sequelize');
 
-mongoose.connect('mongodb://localhost/airbnbDesc')
-  .then(()=>{console.log('connected to mongoDB')});
+// Option 1: Passing parameters separately
+const sequelize = new Sequelize('airbnbDesc', 'root', 'root', {
+  host: 'localhost',
+  dialect: 'postgres',
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
+});
 
-var Property = mongoose.model('Property', propertySchema);
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
-module.exports = Property;
+module.exports = sequelize;
+
+
+
