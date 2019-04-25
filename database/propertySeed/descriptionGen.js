@@ -118,8 +118,9 @@ let hostImgs = [
 ];
 //////////// TODO ///////////////
 
-generateProperty = () => {
+generateProperty = (i) => {
   return {
+    id:i,
     propertyInfo: {
       propType: randomElement(propTypes),
       title: randomElement(titles),
@@ -154,11 +155,11 @@ function writeTenMillionTimes() {
       console.log(i);
       if (i === 0) {
         // last time!
-        file.write(JSON.stringify(generateProperty()));
+        file.write(JSON.stringify(generateProperty(i)));
       } else {
         // See if we should continue, or wait.
         // Don't pass the callback, because we're not done yet.
-        ok = file.write(JSON.stringify(generateProperty()));
+        ok = file.write(JSON.stringify(generateProperty(i)));
       }
     } while (i > 0 && ok);
     if (i > 0) {

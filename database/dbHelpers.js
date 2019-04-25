@@ -1,6 +1,6 @@
-const Property = require('./');
+const Property = require('./index.js');
 
-getPropertyHelper = (num) => Property.find({}).limit(1).skip(num)
+getPropertyHelper = (num) => Property.find({id:num}).limit(1)
 // getPropertyHelper = () => Property.findOne()
 // getPropertyHelper = () => Property.find({})
 
