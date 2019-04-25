@@ -1,3 +1,6 @@
+const Sequelize = require('sequelize')
+const sequelize = require('./index.js')
+
 const HouseDescriptions = sequelize.define('housedescriptions', {
   id: {
     type: Sequelize.INTEGER,
@@ -33,3 +36,10 @@ const HouseDescriptions = sequelize.define('housedescriptions', {
     allowNull: false
   }
 });
+
+User.sync({ force: true }).then(() => 
+  // Now the `users` table in the database corresponds to the model definition
+  console.log('connected to postgresql')
+);
+
+module.exports = HouseDescriptions;
