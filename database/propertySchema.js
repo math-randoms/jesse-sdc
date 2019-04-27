@@ -37,9 +37,9 @@ const HouseDescriptions = sequelize.define('housedescriptions', {
   }
 });
 
-User.sync({ force: true }).then(() => 
+HouseDescriptions.sync({ force: true }).then(() => 
   // Now the `users` table in the database corresponds to the model definition
-  console.log('connected to postgresql')
+  console.log('CONNECTED TO POSTGRESQL')
 );
 
 module.exports = HouseDescriptions;

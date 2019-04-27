@@ -1,6 +1,7 @@
-const fs = require('fs');
-const file = fs.createWriteStream('./seed.json');
-
+// const fs = require('fs');
+// const file = fs.createWriteStream('./seed.json');
+const HouseDescriptions = require('../index.js')
+let counter = 1;
 const adjectives = ['soft', 'open', 'amazing', 'expensive', 'beautiful', 'elegant', 'narrow', 'wet', 'classy', 'spacious', 'lively', 'colorful', 'shiny', 'marvelous', 'nicest', 'comfortable', 'small', 'big', 'huge', 'great', 'impossible', 'possible', 'unremarkable', 'remarkable', 'the best', 'spectacular', 'outstanding', 'lovely', 'incomparable', 'pleasant', 'wonderful', 'incredible', 'marvelous', 'perfect'];
 const adverbs = ['lively', 'actively', 'happily', 'graciously', 'generously', 'genuinely', 'poorly', 'intensely', 'depressingly', 'properly', 'insanely', 'terribly', 'widely', 'wisely', 'stupidly', 'improperly', 'correctly', 'fairly', 'comfortably', 'dryly', 'inconspicuously', 'humorously', 'proactively', 'gracefully'];
 const prepositions = ['to', 'in', 'on', 'over', 'above', 'below', 'under', 'at', 'from', 'into', 'onto', 'on top of', 'of'];
@@ -95,8 +96,7 @@ let amenIcons = [
 
 const firstNames = ['Mark', 'Jaime', 'Arya', 'Cersei', 'Tyrion', 'Michael', 'Sansa', 'Cassie', 'Sarah', 'Jackie', 'John', 'Fred', 'Jacob', 'Daniel', 'Jason', 'Anthony'];
 const lastNames = ['', 'Johnson', 'Lee', 'Smith', 'Snow', 'Matthews', 'Rodriquez', 'Chan', 'Schmidt', 'Lannister', 'Tyrell', 'Stark', 'Bolton'];
-const names = [`${randomElement(firstNames)}`, `${randomElement(firstNames)} ${randomElement(lastNames)}`, `${randomElement(firstNames)} and ${randomElement(firstNames)}`];
-randomElement(names);
+const names = () => [`${randomElement(firstNames)}`, `${randomElement(firstNames)} ${randomElement(lastNames)}`, `${randomElement(firstNames)} and ${randomElement(firstNames)}`];
 let hostImgs = [
   'https://s3-us-west-1.amazonaws.com/airbnb-icons-png/hosts/host-adam.png',
   'https://s3-us-west-1.amazonaws.com/airbnb-icons-png/hosts/host-anthony.png',
@@ -120,12 +120,10 @@ let hostImgs = [
 
 generateProperty = () => {
   return {
-    propertyInfo: {
-      propType: randomElement(propTypes),
-      title: randomElement(titles),
-      location: randomElement(locations),
-      numGuests: randomElement([2, 3, 4, 5, 6, 7, 8])
-    },
+    propType: randomElement(propTypes),
+    title: randomElement(titles),
+    location: randomElement(locations),
+    numGuests: randomElement([2, 3, 4, 5, 6, 7, 8]),
     beds: {
       quantity: randomElement([1, 2, 3, 4, 5, 6])
     },
@@ -136,7 +134,7 @@ generateProperty = () => {
     },
     numBaths: Math.ceil(Math.random() * 4),
     host: {
-      name: randomElement(names),
+      name: randomElement(names()),
       pictureUrl: randomElement(hostImgs) // randomElement(hostUrls)
     },
     summary: makeDescription(),
@@ -144,31 +142,40 @@ generateProperty = () => {
   };
 };
 
-function writeTenMillionTimes() {
-  let i = 1e7;
-  write();
-  function write() {
-    let ok = true;
-    do {
-      i--;
-      console.log(i);
-      if (i === 0) {
-        // last time!
-        file.write(JSON.stringify(generateProperty()));
-      } else {
-        // See if we should continue, or wait.
-        // Don't pass the callback, because we're not done yet.
-        ok = file.write(JSON.stringify(generateProperty()));
+var startTime = new Date();
+var ptarget = 1e7;
+var inprog = 0;
+var ok = true;
+let generateSeed = () => {
+  ptarget--; inprog++;
+  HouseDescriptions.create(generateProperty())
+    .then(() => {
+      inprog--;
+
+      if (inprog >= 7000) {
+        ok = false;
+      } else if (inprog < 4001) {
+        ok = true;
       }
-    } while (i > 0 && ok);
-    if (i > 0) {
-      // had to stop early!
-      // write some more once it drains
-      file.once('drain', write);
-    }
-  }
+
+      endTime = new Date();
+      var timeDiff = (endTime - startTime) / 1000;
+      if (counter % 1000 === 0 || counter === 1) {
+        console.log(`created ${counter / 1000}K, time elapsed ${timeDiff}, in queue: ${inprog}`);
+      }
+      counter++;
+
+      if (ptarget > 0 && ok === true) {
+        for (let m = 0; m < 3000; m++) {
+          if (ptarget > 0) generateSeed();
+        }
+      }
+    })
+    .catch(err => console.error(err));
 }
 
-writeTenMillionTimes();
+for (let m = 0; m < 1; m++) {
+  generateSeed();
+}
 
 // mongoimport --db airbnbDesc --collection properties --file /Users/jessehang/Desktop/jesse-sdc/seed.json
