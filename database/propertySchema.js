@@ -1,14 +1,40 @@
 const Sequelize = require('sequelize')
 const sequelize = require('./index.js')
 
+// let propertySchema = mongoose.Schema({
+//   id: { type: Number, index: true, unique: true },
+//   propertyInfo: { propType: String, title: String, location: String, numGuests: Number },
+//   beds: { quantity: Number, bedType: Array, iconUrl: Array },
+//   amenities: { basic: Array, notIncluded: Array, iconUrl: Array },
+//   numBaths: Number,
+//   host: { name: String, pictureUrl: String },
+//   summary: Array // or String
+// });
+
+// create index locationIndex on housedescriptions using btree (location);
+//drop index locationIndex;
+// create index locationIndex on housedescriptions using hash (location);
+
 const HouseDescriptions = sequelize.define('housedescriptions', {
   id: {
     type: Sequelize.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  propertyInfo: {
-    type: Sequelize.JSON,
+  propType: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
+  location: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
+  numGuests: {
+    type: Sequelize.INTEGER,
     allowNull: true
   },
   beds: {
