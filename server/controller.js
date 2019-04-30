@@ -23,6 +23,12 @@ const controller = {
     House.delete({id})
     .then(data => res.status(203).send('deleted'))
     .catch(err => console.error(err))
+  },
+  getLoc: (req, res) => {
+    const {location} = req.body;
+    House.findOne({offset: 200000, where:{location}})
+    .then(data => res.status(200).send(data))
+    .catch(err => console.error(err))
   }
 }
 

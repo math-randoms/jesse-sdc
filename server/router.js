@@ -4,6 +4,7 @@ const controller = require('./controller.js');
 //req.body
 router
   .route('/desc')
+  .get(controller.getLoc)
   .post(controller.post)
 
 router
