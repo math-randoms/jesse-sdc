@@ -9,5 +9,9 @@ let propertySchema = mongoose.Schema ({
   host: { name: String, pictureUrl: String },
   summary: Array // or String
 });
+
+// id: { type: Number, index: true, unique: true },
+//db.properties.createIndex({"propertyInfo.location": 1})
  
 module.exports = propertySchema;
+
