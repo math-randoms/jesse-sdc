@@ -1,5 +1,25 @@
-const fs = require('fs');
-const file = fs.createWriteStream('./seed.json');
+const MongoClient = require('mongodb').MongoClient;
+const mongoOptions = { useNewUrlParser: true };
+
+const url = 'mongodb://localhost:27017';
+  const dbName = 'airbnbDesc';
+
+let counter = 1;
+let startTime = new Date();
+let ptarget = 1e7;
+let inprog = 0;
+let ok = true;
+
+MongoClient.connect(url, mongoOptions, (err, client) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log('connected to mongoDB');
+    var db = client.db(dbName);
+    var collection = db.collection('properties');
+    generateProperty(collection);
+  }
+});
 
 const adjectives = ['soft', 'open', 'amazing', 'expensive', 'beautiful', 'elegant', 'narrow', 'wet', 'classy', 'spacious', 'lively', 'colorful', 'shiny', 'marvelous', 'nicest', 'comfortable', 'small', 'big', 'huge', 'great', 'impossible', 'possible', 'unremarkable', 'remarkable', 'the best', 'spectacular', 'outstanding', 'lovely', 'incomparable', 'pleasant', 'wonderful', 'incredible', 'marvelous', 'perfect'];
 const adverbs = ['lively', 'actively', 'happily', 'graciously', 'generously', 'genuinely', 'poorly', 'intensely', 'depressingly', 'properly', 'insanely', 'terribly', 'widely', 'wisely', 'stupidly', 'improperly', 'correctly', 'fairly', 'comfortably', 'dryly', 'inconspicuously', 'humorously', 'proactively', 'gracefully'];
@@ -96,7 +116,6 @@ let amenIcons = [
 const firstNames = ['Mark', 'Jaime', 'Arya', 'Cersei', 'Tyrion', 'Michael', 'Sansa', 'Cassie', 'Sarah', 'Jackie', 'John', 'Fred', 'Jacob', 'Daniel', 'Jason', 'Anthony'];
 const lastNames = ['', 'Johnson', 'Lee', 'Smith', 'Snow', 'Matthews', 'Rodriquez', 'Chan', 'Schmidt', 'Lannister', 'Tyrell', 'Stark', 'Bolton'];
 const names = () => [`${randomElement(firstNames)}`, `${randomElement(firstNames)} ${randomElement(lastNames)}`, `${randomElement(firstNames)} and ${randomElement(firstNames)}`];
-randomElement(names);
 let hostImgs = [
   'https://s3-us-west-1.amazonaws.com/airbnb-icons-png/hosts/host-adam.png',
   'https://s3-us-west-1.amazonaws.com/airbnb-icons-png/hosts/host-anthony.png',
@@ -118,15 +137,13 @@ let hostImgs = [
 ];
 //////////// TODO ///////////////
 
-generateProperty = (i) => {
-  return {
-    id:i,
-    propertyInfo: {
-      propType: randomElement(propTypes),
-      title: randomElement(titles),
-      location: randomElement(locations),
-      numGuests: randomElement([2, 3, 4, 5, 6, 7, 8])
-    },
+generateProperty = (collection) => {
+  let obj = {
+    id: ptarget,
+    propType: randomElement(propTypes),
+    title: randomElement(titles),
+    location: randomElement(locations),
+    numGuests: randomElement([2, 3, 4, 5, 6, 7, 8]),
     beds: {
       quantity: randomElement([1, 2, 3, 4, 5, 6])
     },
@@ -143,33 +160,34 @@ generateProperty = (i) => {
     summary: makeDescription(),
     __v: 0
   };
+
+  ptarget--; inprog++;
+  collection.insertOne(obj)
+    .then(() => {
+      inprog--;
+
+      if (inprog >= 400) {
+        ok = false;
+      } else if (inprog < 1) {
+        ok = true;
+      }
+
+      endTime = new Date();
+      var timeDiff = (endTime - startTime) / 1000;
+      if (counter % 10000 === 0 || counter === 1) {
+        console.log(`created ${counter / 1000}K, time elapsed ${timeDiff}, in queue: ${inprog}`);
+      }
+      counter++;
+
+      if (ptarget > 0 && ok === true) {
+        for (let m = 0; m < 400; m++) {
+          if (ptarget > 0) generateProperty(collection);
+        }
+      }
+    })
+    .catch(err => console.error(err));
 };
 
-function writeTenMillionTimes() {
-  let i = 1e7;
-  write();
-  function write() {
-    let ok = true;
-    do {
-      i--;
-      console.log(i);
-      if (i === 0) {
-        // last time!
-        file.write(JSON.stringify(generateProperty(i)));
-      } else {
-        // See if we should continue, or wait.
-        // Don't pass the callback, because we're not done yet.
-        ok = file.write(JSON.stringify(generateProperty(i)));
-      }
-    } while (i > 0 && ok);
-    if (i > 0) {
-      // had to stop early!
-      // write some more once it drains
-      file.once('drain', write);
-    }
-  }
-}
 
-writeTenMillionTimes();
 
 // mongoimport --db airbnbDesc --collection properties --file /Users/jessehang/Desktop/jesse-sdc/seed.json
