@@ -5,6 +5,7 @@ const controller = require('./controller.js');
 router
 .route('/desc')
 .get(controller.get)
+.post(controller.post)
 
 router
 .route('/desc/:loc')

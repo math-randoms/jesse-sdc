@@ -14,7 +14,8 @@ const controller = {
     Model.find({"propertyInfo.location": loc}).skip(200000).limit(1)
     .then(data => res.status(200).send(data))
     .catch(err => res.status(404).send(err));
-  }
+  },
+  
 }
 
 module.exports = controller;
